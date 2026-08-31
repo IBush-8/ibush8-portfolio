@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>IBush8 Admin</title>
+  <style>
+    :root{--bg:#09090b;--panel:#141416;--panel2:#101012;--border:#27272a;--text:#f4f4f5;--muted:#929298;--orange:#ff5a1f;--green:#3ddc84;--red:#ef4444}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,Arial,sans-serif}
+    button,input,textarea{font:inherit}.hidden{display:none!important}.wrap{max-width:1100px;margin:auto;padding:24px}
+    .login{min-height:100vh;display:grid;place-items:center}.box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:28px;width:min(430px,calc(100% - 32px))}
+    h1,h2{margin-top:0}.muted{color:var(--muted)}label{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}
+    input,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:11px;outline:none}
+    input:focus,textarea:focus{border-color:var(--orange)}textarea{min-height:110px;resize:vertical}
+    .btn{border:1px solid var(--border);background:transparent;color:var(--text);padding:10px 15px;border-radius:7px;cursor:pointer}
+    .primary{background:var(--orange);border-color:var(--orange);color:#111}.danger{color:#ff7777}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    header{border-bottom:1px solid var(--border);background:#0c0c0e;position:sticky;top:0;z-index:5}.head{display:flex;justify-content:space-between;align-items:center}
+    .brand{font-weight:800;font-size:19px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+    .project{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding:15px 0}.project:last-child{border:0}
+    .tag{display:inline-block;color:var(--orange);border:1px solid #5a2b1c;background:#21140f;padding:3px 7px;border-radius:4px;font-size:11px;margin:3px}
+    .message{border-bottom:1px solid var(--border);padding:15px 0}.message:last-child{border:0}
+    .status{font-size:12px;color:var(--green)}.error{color:#ff7777;margin-top:10px}.ok{color:var(--green);margin-top:10px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<section id="login" class="login">
+  <div class="box">
+    <h1>IBush8 <span class="muted">/ admin</span></h1>
+    <p class="muted">Private dashboard</p>
+    <form id="loginForm">
+      <label>Email</label><input id="email" type="email" required autocomplete="username">
+      <label>Password</label><input id="password" type="password" required autocomplete="current-password">
+      <button class="btn primary" style="width:100%;margin-top:18px">LOGIN</button>
+      <div id="loginMsg"></div>
+    </form>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+<header><div class="wrap head">
+  <div class="brand"><span class="dot"></span>IBUSH8 / ADMIN</div>
+  <button id="logout" class="btn">LOGOUT</button>
+</div></header>
+<main class="wrap">
+  <div class="row" style="justify-content:space-between;margin-bottom:18px">
+    <div><h1>Dashboard</h1><div class="muted">Manage the data shown on your public portfolio.</div></div>
+    <button id="newProject" class="btn primary">+ ADD PROJECT</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Projects</h2><div id="projects">Loading...</div>
+    </section>
+    <section class="card">
+      <h2>Messages</h2><div id="messages">Loading...</div>
+    </section>
+  </div>
+
+  <section id="editor" class="card hidden" style="margin-top:18px">
+    <h2 id="editorTitle">Add project</h2>
+    <form id="projectForm">
+      <input id="projectId" type="hidden">
+      <label>Name</label><input id="pName" required maxlength="120">
+      <label>Slug</label><input id="pSlug" required maxlength="140" pattern="[a-z0-9-]+">
+      <label>Persian description</label><textarea id="pFa" required></textarea>
+      <label>English description</label><textarea id="pEn" required></textarea>
+      <label>Stack (comma separated)</label><input id="pStack" placeholder="Node.js, Express, MongoDB">
+      <label>GitHub / project URL</label><input id="pRepo" type="url" required>
+      <label>Repository label</label><input id="pRepoLabel" required>
+      <label>Order</label><input id="pOrder" type="number" min="0" value="0">
+      <label><input id="pFeatured" type="checkbox" style="width:auto"> Featured</label>
+      <div class="row" style="margin-top:16px">
+        <button class="btn primary">SAVE PROJECT</button>
+        <button type="button" id="cancelEdit" class="btn">CANCEL</button>
+      </div>
+      <div id="saveMsg"></div>
+    </form>
+  </section>
+</main>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+const tokenKey='ibush8_admin_token';
+const token=()=>localStorage.getItem(tokenKey);
+
+function showError(el,msg){el.className='error';el.textContent=msg}
+async function api(url,opts={}){
+  opts.headers={...(opts.headers||{}),'Content-Type':'application/json'};
+  if(token()) opts.headers.Authorization='Bearer '+token();
+  const r=await fetch(url,opts), data=await r.json().catch(()=>({}));
+  if(r.status===401){localStorage.removeItem(tokenKey);location.reload()}
+  if(!r.ok) throw new Error(data.message||'Request failed');
+  return data;
+}
+
+async function load(){
+  try{
+    const p=await api('/api/projects');
+    $('projects').innerHTML=p.data.map(x=>`
+      <div class="project">
+        <div><b>${esc(x.name)}</b><div class="muted">${esc(x.slug)}</div>
+        <div>${x.stack.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div></div>
+        <div class="row"><button class="btn" onclick="editProject('${x.id}')">EDIT</button>
+        <button class="btn danger" onclick="deleteProject('${x.id}')">DELETE</button></div>
+      </div>`).join('')||'<p class="muted">No projects.</p>';
+
+    const m=await api('/api/contact');
+    $('messages').innerHTML=m.data.map(x=>`
+      <div class="message"><b>${esc(x.name)}</b> <span class="muted">&lt;${esc(x.email)}&gt;</span>
+      <div class="muted">${new Date(x.createdAt).toLocaleString()}</div>
+      <p>${esc(x.message)}</p><span class="status">${esc(x.status)}</span></div>`
+    ).join('')||'<p class="muted">No messages.</p>';
+  }catch(e){console.error(e)}
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();$('loginMsg').textContent='';
+  try{const d=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:$('email').value,password:$('password').value})});
+    const j=await d.json();if(!d.ok)throw new Error(j.message||'Login failed');
+    localStorage.setItem(tokenKey,j.token);location.reload();
+  }catch(x){showError($('loginMsg'),x.message)}
+};
+
+$('logout').onclick=async()=>{try{await api('/api/admin/logout',{method:'POST'})}catch{} localStorage.removeItem(tokenKey);location.reload()};
+$('newProject').onclick=()=>openEditor();
+$('cancelEdit').onclick=()=>{$('editor').classList.add('hidden')};
+
+function openEditor(p=null){
+  $('editor').classList.remove('hidden');$('editorTitle').textContent=p?'Edit project':'Add project';
+  $('projectId').value=p?.id||'';$('pName').value=p?.name||'';$('pSlug').value=p?.slug||'';
+  $('pFa').value=p?.descriptionFa||'';$('pEn').value=p?.descriptionEn||'';
+  $('pStack').value=(p?.stack||[]).join(', ');$('pRepo').value=p?.repoUrl||'';
+  $('pRepoLabel').value=p?.repoLabel||'';$('pOrder').value=p?.order||0;$('pFeatured').checked=!!p?.featured;
+  scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+async function editProject(id){
+  try{const d=await api('/api/projects/'+id);openEditor(d.data)}catch(e){alert(e.message)}
+}
+async function deleteProject(id){
+  if(!confirm('Delete this project?'))return;
+  try{await api('/api/projects/'+id,{method:'DELETE'});load()}catch(e){alert(e.message)}
+}
+$('projectForm').onsubmit=async e=>{
+  e.preventDefault();$('saveMsg').textContent='';
+  const body={name:$('pName').value.trim(),slug:$('pSlug').value.trim(),descriptionFa:$('pFa').value.trim(),
+    descriptionEn:$('pEn').value.trim(),stack:$('pStack').value.split(',').map(x=>x.trim()).filter(Boolean),
+    repoUrl:$('pRepo').value.trim(),repoLabel:$('pRepoLabel').value.trim(),order:Number($('pOrder').value||0),featured:$('pFeatured').checked};
+  try{
+    const id=$('projectId').value;
+    await api(id?'/api/projects/'+id:'/api/projects',{method:id?'PATCH':'POST',body:JSON.stringify(body)});
+    $('saveMsg').className='ok';$('saveMsg').textContent='Saved.';
+    setTimeout(()=>{$('editor').classList.add('hidden');load()},400);
+  }catch(x){showError($('saveMsg'),x.message)}
+};
+
+if(token()){ $('login').classList.add('hidden');$('app').classList.remove('hidden');load(); }
+</script>
+</body>
+</html>

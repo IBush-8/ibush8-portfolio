@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBush8 — Backend Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --panel:#141416;
+    --panel2:#0f0f11;
+    --border:#232326;
+    --orange:#ff5a1f;
+    --orange-dim:#c2410c;
+    --text:#f2f0ea;
+    --muted:#8b8b90;
+    --green:#3ddc84;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+    overflow-x:hidden;
+    transition:background .2s;
+  }
+  html[lang="fa"] body{font-family:'Vazirmatn', system-ui, sans-serif;}
+  html[lang="en"] body{font-family:'Inter', system-ui, sans-serif;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  html[lang="fa"] .display{font-family:'Vazirmatn', sans-serif; font-weight:700;}
+  html[lang="en"] .display{font-family:'Space Grotesk', sans-serif; font-weight:700;}
+  ::selection{background:var(--orange); color:#0a0a0b;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  img,svg{display:block;}
+
+  nav{position:sticky; top:0; z-index:50; background:rgba(10,10,11,0.85); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 24px; max-width:1080px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; letter-spacing:0.5px;}
+  .brand .dot{width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+  .navlinks{display:flex; gap:26px; font-size:14px;}
+  .navlinks a{color:var(--muted); font-family:'IBM Plex Mono'; font-size:12.5px; transition:color .2s;}
+  .navlinks a:hover{color:var(--orange);}
+  .nav-right{display:flex; align-items:center; gap:12px;}
+  .status-pill{font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--green); border:1px solid rgba(61,220,132,0.3); background:rgba(61,220,132,0.06); padding:4px 10px; border-radius:20px; white-space:nowrap;}
+  .lang-toggle{font-family:'IBM Plex Mono'; font-size:12px; border:1px solid var(--border); background:var(--panel); color:var(--text); padding:6px 12px; border-radius:6px; cursor:pointer; transition:.2s;}
+  .lang-toggle:hover{border-color:var(--orange); color:var(--orange);}
+  @media(max-width:700px){.navlinks{display:none;}}
+
+  .hero{padding:80px 0 64px; position:relative;}
+  .hero-grid{position:absolute; inset:0; background-image:linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size:48px 48px; opacity:0.25; mask-image:radial-gradient(ellipse 60% 50% at 50% 0%, #000 40%, transparent 100%); pointer-events:none;}
+  .terminal{background:var(--panel); border:1px solid var(--border); border-radius:10px; max-width:640px; margin:0 0 34px; overflow:hidden; box-shadow:0 0 0 1px rgba(255,90,31,0.04), 0 20px 60px -20px rgba(0,0,0,0.6);}
+  .term-bar{display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--panel2); border-bottom:1px solid var(--border); direction:ltr;}
+  .term-bar span{width:10px; height:10px; border-radius:50%; background:#3a3a3d;}
+  .term-bar .id{margin-inline-start:auto; font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted);}
+  .term-body{padding:20px; font-family:'IBM Plex Mono'; font-size:13.5px; color:#c9c9cd; direction:ltr; text-align:left; min-height:150px;}
+  .term-body .line{margin-bottom:6px; white-space:pre-wrap;}
+  .prompt{color:var(--orange);}
+  .cursor{display:inline-block; width:8px; height:15px; background:var(--orange); vertical-align:middle; animation:blink 1s step-end infinite; margin-inline-end:2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  h1.headline{font-weight:700; font-size:clamp(30px,5.5vw,52px); line-height:1.25; margin-bottom:18px;}
+  h1.headline .accent{color:var(--orange);}
+  .sub{color:var(--muted); font-size:16.5px; max-width:560px; margin-bottom:30px;}
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{font-family:'IBM Plex Mono'; font-size:13px; padding:12px 22px; border-radius:6px; font-weight:500; transition:all .2s; display:inline-flex; align-items:center; gap:8px; border:none; cursor:pointer;}
+  .btn-primary{background:var(--orange); color:#0a0a0b;}
+  .btn-primary:hover{background:#ff7040; transform:translateY(-1px);}
+  .btn-ghost{border:1px solid var(--border); color:var(--text); background:transparent;}
+  .btn-ghost:hover{border-color:var(--orange); color:var(--orange);}
+
+  section{padding:76px 0;}
+  .eyebrow{font-family:'IBM Plex Mono'; font-size:12px; color:var(--orange); margin-bottom:12px; display:flex; align-items:center; gap:10px;}
+  .eyebrow::after{content:''; height:1px; flex:1; background:var(--border);}
+  h2.sec-title{font-weight:700; font-size:clamp(22px,3.2vw,30px); margin-bottom:36px;}
+
+  .about-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:40px; align-items:start;}
+  @media(max-width:760px){.about-grid{grid-template-columns:1fr;}}
+  .about-text p{color:#cfcfd2; margin-bottom:16px; font-size:15.5px;}
+  .about-text strong{color:var(--orange); font-weight:600;}
+  .info-card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:20px 22px; font-family:'IBM Plex Mono'; font-size:12.5px;}
+  .info-row{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); direction:ltr;}
+  .info-row:last-child{border-bottom:none;}
+  .info-row .k{color:var(--muted);}
+  .info-row .v{color:var(--text); text-align:right;}
+
+  .pipeline{display:flex; gap:0; overflow-x:auto; padding-bottom:8px;}
+  .stage{flex:1; min-width:150px; position:relative; padding:20px 16px; background:var(--panel); border:1px solid var(--border); text-align:center;}
+  .stage:first-child{border-radius:10px 0 0 10px;}
+  html[dir="rtl"] .stage:first-child{border-radius:0 10px 10px 0;}
+  .stage:last-child{border-radius:0 10px 10px 0;}
+  html[dir="rtl"] .stage:last-child{border-radius:10px 0 0 10px;}
+  .stage + .stage{border-inline-start:none;}
+  .stage .num{font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); margin-bottom:8px;}
+  .stage .label{font-weight:600; font-size:14px;}
+  .stage.active{background:rgba(255,90,31,0.08); border-color:var(--orange);}
+  .stage.active .num{color:var(--orange);}
+  .stage.active::after{content:''; position:absolute; top:-1px; left:0; right:0; height:2px; background:var(--orange); box-shadow:0 0 10px var(--orange);}
+  @media(max-width:700px){.pipeline{flex-direction:column;} .stage:first-child,.stage:last-child{border-radius:10px;}}
+
+  .manifest{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:24px 26px; font-family:'IBM Plex Mono'; font-size:13px; direction:ltr; text-align:left; overflow-x:auto;}
+  .manifest .k{color:#7dd3fc;}
+  .manifest .s{color:#a8e6a1;}
+  .manifest .c{color:var(--muted);}
+  .manifest-line{padding:2px 0; white-space:pre;}
+
+  .proj-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:760px){.proj-grid{grid-template-columns:1fr;}}
+  .proj-card{background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:border-color .2s, transform .2s;}
+  .proj-card:hover{border-color:var(--orange); transform:translateY(-3px);}
+  .proj-head{display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--panel2); border-bottom:1px solid var(--border); font-family:'IBM Plex Mono'; font-size:12px; direction:ltr;}
+  .method{color:var(--green); font-weight:600;}
+  .status200{margin-inline-start:auto; color:var(--muted);}
+  .proj-body{padding:18px 16px;}
+  .proj-name{font-weight:700; font-size:17px; margin-bottom:8px;}
+  .proj-desc{color:#c2c2c6; font-size:14px; margin-bottom:14px;}
+  .tags{display:flex; gap:8px; flex-wrap:wrap; direction:ltr;}
+  .tag{font-family:'IBM Plex Mono'; font-size:11px; color:var(--orange); background:rgba(255,90,31,0.08); border:1px solid rgba(255,90,31,0.2); padding:3px 8px; border-radius:4px;}
+  .proj-link{font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--muted); margin-top:10px; display:inline-block; direction:ltr;}
+  .proj-link:hover{color:var(--orange);}
+
+  .contact-card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:28px; max-width:600px;}
+  .req-line{font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--green); margin-bottom:20px; direction:ltr; word-break:break-all;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-family:'IBM Plex Mono'; font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .field input, .field textarea{width:100%; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:11px 12px; color:var(--text); font-family:inherit; font-size:14px; resize:vertical;}
+  .field input:focus, .field textarea:focus{outline:none; border-color:var(--orange);}
+  .socials{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap;}
+  .social-btn{font-family:'IBM Plex Mono'; font-size:12px; border:1px solid var(--border); padding:9px 14px; border-radius:6px; transition:.2s;}
+  .social-btn:hover{border-color:var(--orange); color:var(--orange);}
+
+  footer{border-top:1px solid var(--border); padding:24px 0; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--muted);}
+  .footer-inner{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; direction:ltr;}
+
+  .reveal{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{outline:2px solid var(--orange); outline-offset:2px;}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span>IBUSH8</div>
+    <div class="navlinks">
+      <a href="#about" data-t="nav.about">درباره</a>
+      <a href="#trajectory" data-t="nav.trajectory">مسیر</a>
+      <a href="#skills" data-t="nav.stack">استک</a>
+      <a href="#projects" data-t="nav.projects">پروژه‌ها</a>
+      <a href="#contact" data-t="nav.contact">تماس</a>
+    </div>
+    <div class="nav-right">
+      <button class="lang-toggle" id="langBtn">EN</button>
+      <div class="status-pill mono" data-t="nav.status">● وضعیت: در دسترس</div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="wrap" style="position:relative;">
+    <div class="terminal">
+      <div class="term-bar"><span></span><span></span><span></span><div class="id">ibush8@server ~ %</div></div>
+      <div class="term-body" id="term"></div>
+    </div>
+    <h1 class="headline display"><span data-t="hero.h1a">من سرویس‌هایی می‌سازم که</span> <span class="accent" data-t="hero.h1b">از پا نمی‌افتن.</span></h1>
+    <p class="sub" data-t="hero.sub">بک‌اند دولوپر — Node.js / Express / MongoDB / PostgreSQL. کدی که تحت فشار هم درست جواب می‌ده، نه فقط تو دمو.</p>
+    <div class="cta-row">
+      <a href="#projects" class="btn btn-primary"><span data-t="hero.ctaProjects">GET /projects</span> →</a>
+      <a href="#contact" class="btn btn-ghost"><span data-t="hero.ctaContact">POST /contact</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="eyebrow">GET /about</div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p data-t="about.p1">یه بک‌اند دولوپرم که کار رو از پایه شروع کردم و مسیرم رو مرحله‌به‌مرحله سخت‌تر کردم: از <strong>Node.js و Express</strong> شروع کردم، الان دارم روی <strong>PostgreSQL، TypeScript، Docker و معماری سیستم‌های توزیع‌شده</strong> عمیق‌تر می‌شم.</p>
+        <p data-t="about.p2">هدفم فقط نوشتن کد نیست؛ ساختن سیستم‌هایی‌ه که مقیاس می‌خورن، fail-safe هستن، و یه تیم واقعی می‌تونه روشون کار کنه. دارم آماده می‌شم برای کار ریموت بین‌المللی — یعنی استانداردم باید همون استاندارد جهانی باشه.</p>
+      </div>
+      <div class="info-card reveal">
+        <div class="info-row"><span class="k">role</span><span class="v" data-t="about.infoRole">Backend Engineer</span></div>
+        <div class="info-row"><span class="k">focus</span><span class="v">Node.js / Express / DB</span></div>
+        <div class="info-row"><span class="k">growing_into</span><span class="v" data-t="about.infoGrowth">Full-stack → Systems</span></div>
+        <div class="info-row"><span class="k">target</span><span class="v" data-t="about.infoTarget">Remote / International</span></div>
+        <div class="info-row"><span class="k">github</span><span class="v">IBush-8</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="trajectory">
+  <div class="wrap">
+    <div class="eyebrow">GET /roadmap</div>
+    <h2 class="sec-title display" data-t="trajectory.title">مسیری که دارم می‌سازم</h2>
+    <div class="pipeline reveal">
+      <div class="stage active"><div class="num">01</div><div class="label" data-t="trajectory.s1">مهارت</div></div>
+      <div class="stage"><div class="num">02</div><div class="label" data-t="trajectory.s2">سرویس</div></div>
+      <div class="stage"><div class="num">03</div><div class="label" data-t="trajectory.s3">سیستم</div></div>
+      <div class="stage"><div class="num">04</div><div class="label" data-t="trajectory.s4">محصول</div></div>
+      <div class="stage"><div class="num">05</div><div class="label" data-t="trajectory.s5">شرکت</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="eyebrow">GET /stack/manifest.json</div>
+    <div class="manifest reveal">
+      <div class="manifest-line"><span class="c">{</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;<span class="k">"dependencies"</span>: <span class="c">{</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"node"</span>: <span class="s">"^2.0.0"</span>,   <span class="c" data-t="skills.stable">// stable</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"express"</span>: <span class="s">"^2.0.0"</span>,   <span class="c" data-t="skills.stable">// stable</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"mongodb"</span>: <span class="s">"^1.8.0"</span>,   <span class="c" data-t="skills.stable">// stable</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"postgresql"</span>: <span class="s">"^0.7.0-rc"</span>,   <span class="c" data-t="skills.strengthening">// strengthening</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"typescript"</span>: <span class="s">"^0.6.0-beta"</span>,   <span class="c" data-t="skills.closing">// closing gaps</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"react"</span>: <span class="s">"^0.5.0-beta"</span>,   <span class="c" data-t="skills.developing">// developing</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"docker"</span>: <span class="s">"^0.2.0-alpha"</span>   <span class="c" data-t="skills.learning">// learning</span></div>
+      <div class="manifest-line">&nbsp;&nbsp;<span class="c">}</span>,</div>
+      <div class="manifest-line">&nbsp;&nbsp;<span class="k">"roadmap"</span>: <span class="c">[</span><span class="s">"AWS"</span>, <span class="s">"Redis"</span>, <span class="s">"CI/CD"</span>, <span class="s">"system design"</span><span class="c">]</span></div>
+      <div class="manifest-line"><span class="c">}</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="eyebrow">GET /projects</div>
+    <div class="proj-grid" id="projGrid"></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="eyebrow">POST /contact</div>
+    <div class="contact-card reveal">
+      <div class="req-line">$ curl -X POST https://ibush8.dev/contact \</div>
+      <form id="contactForm">
+        <div class="field"><label data-t="contact.name">name</label><input type="text" id="fName" required></div>
+        <div class="field"><label data-t="contact.email">email</label><input type="email" id="fEmail" placeholder="you@example.com" required></div>
+        <div class="field"><label data-t="contact.message">message</label><textarea rows="4" id="fMessage" required></textarea></div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;"><span data-t="contact.send">Send Request</span> →</button>
+      </form>
+      <div class="socials">
+        <a href="https://github.com/IBush-8" target="_blank" class="social-btn">github.com/IBush-8</a>
+        <a href="https://www.linkedin.com/in/amir-mohammad-maleki-53511a424/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3Bhco1VP2xSjiqIUBZdY%2BELQ%3D%3D" class="social-btn" data-t="contact.linkedin">linkedin.com/amir-mohammad-maleki</a>
+        <a href="#" class="social-btn" data-t="contact.emailPlaceholder">itsibush8@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 IBush8</span>
+    <span id="uptime">uptime: calculating...</span>
+  </div>
+</footer>
+
+<script>
+const dict = {
+  fa: {
+    "nav.about":"درباره", "nav.trajectory":"مسیر", "nav.stack":"استک", "nav.projects":"پروژه‌ها", "nav.contact":"تماس",
+    "nav.status":"● وضعیت: در دسترس",
+    "hero.h1a":"من سرویس‌هایی می‌سازم که", "hero.h1b":"از پا نمی‌افتن.",
+    "hero.sub":"بک‌اند دولوپر — Node.js / Express / MongoDB / PostgreSQL. کدی که تحت فشار هم درست جواب می‌ده، نه فقط تو دمو.",
+    "hero.ctaProjects":"GET /projects", "hero.ctaContact":"POST /contact",
+    "about.p1":"یه بک‌اند دولوپرم که کار رو از پایه شروع کردم و مسیرم رو مرحله‌به‌مرحله سخت‌تر کردم: از <strong>Node.js و Express</strong> شروع کردم، الان دارم روی <strong>PostgreSQL، TypeScript، Docker و معماری سیستم‌های توزیع‌شده</strong> عمیق‌تر می‌شم.",
+    "about.p2":"هدفم فقط نوشتن کد نیست؛ ساختن سیستم‌هایی‌ه که مقیاس می‌خورن، fail-safe هستن، و یه تیم واقعی می‌تونه روشون کار کنه. دارم آماده می‌شم برای کار ریموت بین‌المللی — یعنی استانداردم باید همون استاندارد جهانی باشه.",
+    "about.infoRole":"بک‌اند دولوپر", "about.infoGrowth":"فول‌استک ← سیستم‌ها", "about.infoTarget":"ریموت / بین‌المللی",
+    "trajectory.title":"مسیری که دارم می‌سازم",
+    "trajectory.s1":"مهارت", "trajectory.s2":"سرویس", "trajectory.s3":"سیستم", "trajectory.s4":"محصول", "trajectory.s5":"شرکت",
+    "skills.stable":"// پایدار", "skills.strengthening":"// در حال تقویت", "skills.closing":"// در حال پرکردن گپ", "skills.developing":"// در حال توسعه", "skills.learning":"// در حال یادگیری",
+    "contact.name":"اسم", "contact.email":"ایمیل", "contact.message":"پیام", "contact.send":"ارسال درخواست",
+    termLines: ["$ whoami","IBush8 — بک‌اند دولوپر","$ status --check","سرور: آنلاین | تاخیر: ۱۲ms | خطا: ۰","$ echo $MISSION","ساختن سیستم‌هایی که از پا نمی‌افتن."],
+    projects: [
+      {name:"E-commerce Backend", desc:"بک‌اند کامل یه فروشگاه آنلاین: مدیریت محصول، سبد خرید، سفارش و auth.", stack:["Node.js","Express","MongoDB"], repo:"github.com/IBush-8/ecommerce-backend"},
+      {name:"Hospital Shift Management", desc:"سیستم مدیریت شیفت پرسنل بیمارستان — زمان‌بندی، تخصیص نقش و گزارش‌گیری.", stack:["Node.js","Express","MongoDB"], repo:"github.com/IBush-8"},
+      {name:"Radio App Backend", desc:"بک‌اند یه اپلیکیشن رادیوی آنلاین — استریم، پلی‌لیست و مدیریت محتوا.", stack:["Node.js","Express"], repo:"github.com/IBush-8"},
+      {name:"Arko Tournament Platform", desc:"پلتفرم برگزاری تورنمنت — ثبت‌نام تیم‌ها، براکت‌بندی و نتایج زنده.", stack:["Node.js","MongoDB"], repo:"github.com/IBush-8"}
+    ],
+    formAlert:"فرم فعلا نمایشیه — بک‌اندش رو بعدا وصل می‌کنیم.",
+    builtWith:"© ۲۰۲۶ IBush8 — ساخته‌شده با انرژی Node.js"
+  },
+  en: {
+    "nav.about":"about", "nav.trajectory":"path", "nav.stack":"stack", "nav.projects":"projects", "nav.contact":"contact",
+    "nav.status":"● status: available",
+    "hero.h1a":"I build services that", "hero.h1b":"don't fall over.",
+    "hero.sub":"Backend developer — Node.js / Express / MongoDB / PostgreSQL. Code that holds up under load, not just in a demo.",
+    "hero.ctaProjects":"GET /projects", "hero.ctaContact":"POST /contact",
+    "about.p1":"I'm a backend developer who started from the fundamentals and made the path harder step by step: began with <strong>Node.js and Express</strong>, now going deeper into <strong>PostgreSQL, TypeScript, Docker, and distributed systems architecture</strong>.",
+    "about.p2":"The goal isn't just writing code — it's building systems that scale, fail safely, and a real team can work on. Preparing for international remote work means holding myself to a global standard, not a local one.",
+    "about.infoRole":"Backend Engineer", "about.infoGrowth":"Full-stack → Systems", "about.infoTarget":"Remote / International",
+    "trajectory.title":"The path I'm building",
+    "trajectory.s1":"Skill", "trajectory.s2":"Service", "trajectory.s3":"System", "trajectory.s4":"Product", "trajectory.s5":"Company",
+    "skills.stable":"// stable", "skills.strengthening":"// strengthening", "skills.closing":"// closing gaps", "skills.developing":"// developing", "skills.learning":"// learning",
+    "contact.name":"name", "contact.email":"email", "contact.message":"message", "contact.send":"Send Request",
+    "contact.linkedin":"linkedin (add your real link)", "contact.emailPlaceholder":"email (add your real one)",
+    termLines: ["$ whoami","IBush8 — Backend Engineer","$ status --check","server: online | latency: 12ms | errors: 0","$ echo $MISSION","building systems that don't fall over."],
+    projects: [
+      {name:"E-commerce Backend", desc:"A full backend for an online store: product management, cart, orders, and auth.", stack:["Node.js","Express","MongoDB"], repo:"github.com/IBush-8/ecommerce-backend"},
+      {name:"Hospital Shift Management", desc:"Staff shift management system for a hospital — scheduling, role assignment, reporting.", stack:["Node.js","Express","MongoDB"], repo:"github.com/IBush-8"},
+      {name:"Radio App Backend", desc:"Backend for an online radio application — streaming, playlists, content management.", stack:["Node.js","Express"], repo:"github.com/IBush-8"},
+      {name:"Arko Tournament Platform", desc:"Tournament platform — team registration, bracket generation, live results.", stack:["Node.js","MongoDB"], repo:"github.com/IBush-8"}
+    ],
+    formAlert:"This form is a preview for now — I'll wire up the backend next.",
+    builtWith:"© 2026 IBush8 — built with Node.js energy"
+  }
+};
+
+let currentLang = 'fa';
+
+function applyLang(lang){
+  currentLang = lang;
+  const html = document.getElementById('htmlRoot');
+  html.setAttribute('lang', lang);
+  html.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+  document.getElementById('langBtn').textContent = lang === 'fa' ? 'EN' : 'فا';
+
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const key = el.getAttribute('data-t');
+    if(dict[lang][key] !== undefined) el.innerHTML = dict[lang][key];
+  });
+
+  renderProjects(lang);
+  restartTerminal(lang);
+  document.querySelector('footer .wrap span').textContent = dict[lang].builtWith;
+  document.getElementById('contactForm').dataset.alert = dict[lang].formAlert;
+}
+
+document.getElementById('langBtn').addEventListener('click', ()=>{
+  applyLang(currentLang === 'fa' ? 'en' : 'fa');
+});
+
+let termTimeouts = [];
+function restartTerminal(lang){
+  termTimeouts.forEach(t=>clearTimeout(t));
+  termTimeouts = [];
+  const term = document.getElementById('term');
+  term.innerHTML = '';
+  const lines = dict[lang].termLines;
+  let li = 0;
+  function typeLine(){
+    if(li >= lines.length){ term.innerHTML += '<span class="cursor"></span>'; return; }
+    const isCmd = li % 2 === 0;
+    const div = document.createElement('div');
+    div.className = 'line';
+    term.appendChild(div);
+    const text = lines[li];
+    let i = 0;
+    const iv = setInterval(()=>{
+      div.innerHTML = (isCmd ? '<span class="prompt">›</span> ' : '') + text.slice(0, i+1);
+      i++;
+      if(i >= text.length){
+        clearInterval(iv);
+        li++;
+        const t = setTimeout(typeLine, isCmd ? 220 : 480);
+        termTimeouts.push(t);
+      }
+    }, isCmd ? 32 : 16);
+  }
+  typeLine();
+}
+
+async function renderProjects(lang){
+  const grid = document.getElementById('projGrid');
+  grid.innerHTML = '<div class="proj-desc">loading projects...</div>';
+
+  try {
+    const res = await fetch('/api/projects?lang=' + encodeURIComponent(lang));
+    if (!res.ok) throw new Error('projects request failed');
+    const payload = await res.json();
+
+    grid.innerHTML = '';
+    payload.data.forEach(p=>{
+      const card = document.createElement('div');
+      card.className = 'proj-card';
+      card.innerHTML = `
+        <div class="proj-head">
+          <span class="method">GET</span>
+          <span>/projects/${p.slug}</span>
+          <span class="status200">200 OK</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-name display">${escapeHtml(p.name)}</div>
+          <div class="proj-desc">${escapeHtml(p.description)}</div>
+          <div class="tags">${p.stack.map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join('')}</div>
+          <a class="proj-link" href="${escapeAttribute(p.repoUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.repoLabel)} →</a>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    grid.innerHTML = '<div class="proj-desc">Could not load projects from API.</div>';
+    console.error(err);
+  }
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[ch]));
+}
+function escapeAttribute(value){
+  return escapeHtml(value);
+}
+
+const start = new Date('2024-01-01T00:00:00');
+function updateUptime(){
+  const days = Math.floor((Date.now() - start.getTime())/86400000);
+  document.getElementById('uptime').textContent = `uptime: ${days}d`;
+}
+updateUptime();
+
+document.getElementById('contactForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+
+  const button = this.querySelector('button[type="submit"]');
+  const original = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = 'sending...';
+
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: document.getElementById('fName').value.trim(),
+        email: document.getElementById('fEmail').value.trim(),
+        message: document.getElementById('fMessage').value.trim()
+      })
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.message || 'Request failed');
+    }
+
+    alert(currentLang === 'fa'
+      ? 'پیامت با موفقیت ثبت شد. به‌زودی بررسی می‌کنم.'
+      : 'Your message was received successfully. I will review it soon.');
+
+    this.reset();
+  } catch (err) {
+    alert(currentLang === 'fa'
+      ? 'ارسال پیام ناموفق بود. دوباره تلاش کن.'
+      : 'Could not send the message. Please try again.');
+    console.error(err);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = original;
+  }
+});
+
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('in'); });
+}, {threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+applyLang('fa');
+</script>
+
+</body>
+</html>
